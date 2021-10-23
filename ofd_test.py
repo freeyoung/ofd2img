@@ -9,7 +9,8 @@ for path in os.listdir(folder):
     file_path = os.path.join(folder, path)
     print(f"> Reading from OFD: {file_path}")
     doc = OFDFile(file_path)
-    png_paths = [p.as_posix() for p in doc.draw_document(destination=folder)]
+    destination = os.path.join(folder, path.replace(".ofd", ""))
+    png_paths = [p.as_posix() for p in doc.draw_document(destination=destination)]
     print(f"> Converted PNG(s):")
     print("\n".join(png_paths))
     pdf_path = os.path.join(folder, path.replace(".ofd", ".pdf"))
