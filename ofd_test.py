@@ -8,4 +8,4 @@ for path in os.listdir(folder):
     print("read file", path)
     file_path = os.path.join(folder, path)
     doc = OFDFile(file_path)
-    doc.draw_document()
+    doc.draw_document(destination=folder)
