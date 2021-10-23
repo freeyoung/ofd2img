@@ -248,19 +248,18 @@ def cairo_image(cr, node):
     cr.save()
     x, y = boundary[0], boundary[1]
     width, height = cr.get_matrix().transform_point(boundary[2], boundary[3])
-    # print('cairo image ctm:', ctm)  # ctm用不到
     x, y = cr.get_matrix().transform_point(x, y)
 
     # 画图片是fillparent，自己重新计算缩放matrix， 同时缩放基础点x，y
     matrix = cairo.Matrix(
         width / img_surface.get_width(), 0, 0, height / img_surface.get_height(), 0, 0
     )
+    if ctm:  # 再过几天，我保证不记得自己为什么会这么写
+        matrix = cairo.Matrix(*map(lambda x: x * SCALE_192, ctm))
+        matrix.scale(img_surface.get_width() ** -1, img_surface.get_height() ** -1)
     cr.identity_matrix()
     cr.set_matrix(matrix)
     matrix.invert()
-    x, y = matrix.transform_point(x, y)
-    # x, y = cr.get_matrix().invert().transform_point(x, y)
-    # print(x, y)
     cr.set_source_surface(img_surface, x, y)
     cr.paint()
     cr.restore()
