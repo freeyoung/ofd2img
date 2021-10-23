@@ -1,5 +1,6 @@
 import platform
 import gi
+from PIL import Image as PILImage
 
 gi.require_version("Gtk", "3.0")
 gi.require_version("PangoCairo", "1.0")
@@ -86,12 +87,24 @@ class Image(MultiMedia):
 
             x_path = _zf.extract(jb2_path, path=work_folder)
             png_path = x_path.replace(".jb2", ".png")
+            pbm_path = x_path.replace(".jb2", ".pbm")
 
             if platform.system() == "Windows":
-                Popen(["./bin/jbig2dec", "-o", png_path, x_path], stdout=PIPE)
+                Popen(["./bin/jbig2dec", "-o", png_path, x_path], stdout=PIPE).communicate()
             else:
-                Popen(["jbig2dec", "-o", png_path, x_path], stdout=PIPE)
+                Popen(["jbig2dec", "-o", pbm_path, x_path], stdout=PIPE).communicate()
+                with PILImage.open(pbm_path) as im:
+                    im.save(png_path)
 
+            self.png_location = png_path
+        elif suffix in ("jpg", "jpeg"):
+            jpg_path = [loc for loc in _zf.namelist() if self.location in loc][0]
+
+            x_path = _zf.extract(jpg_path, path=work_folder)
+            png_path = x_path.replace(f".{suffix}", ".png")
+
+            with PILImage.open(x_path) as im:
+                im.save(png_path)
             self.png_location = png_path
 
     def get_cairo_surface(self):
