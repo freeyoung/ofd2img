@@ -11,6 +11,8 @@ from .constants import UNITS
 from .resources import res_add_font, res_add_multimedia
 from .surface import *
 from pathlib import Path
+from PIL import Image, ImageStat
+from io import BytesIO
 import tempfile
 import shutil
 
@@ -211,9 +213,16 @@ class Surface(object):
             self.cr.translate(90, 8)
             self.cairo_draw(self.cr, self.page.seal_node)
 
-        path = path or f"{self.filename}_{page.name}.png"
-        cairo_surface.write_to_png(path)
+        bio = BytesIO()
+        cairo_surface.write_to_png(bio)
         cairo_surface.finish()
+        path = path or f"{self.filename}_{page.name}.png"
+        im = Image.open(bio)
+        stat_var = ImageStat.Stat(im).var
+        # detect grayscale - 100 is a naïve threshold
+        if len(stat_var) == 3 and abs(max(stat_var) - min(stat_var)) < 100:
+            im = im.convert("L")
+        im.save(path)
         return path
 
 
