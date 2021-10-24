@@ -45,7 +45,7 @@ class OFDFile(object):
         root = cssselect2.ElementWrapper.from_xml_root(tree)
         return Node(root)
 
-    def draw_document(self, doc_num=0, destination: Optional[str] = None):
+    def draw_document(self, doc_num=0, destination: Optional[str] = None, output_format: Optional[str] = "png"):
         document = self.document
         destination = destination or "."
         destination = Path(destination)
@@ -54,7 +54,7 @@ class OFDFile(object):
         for i, page in enumerate(document.pages):
             surface = Surface(page, os.path.split(self.zf.filename)[-1].strip(".ofd"))
             paths.append(
-                surface.draw(page, destination / Path(f"{surface.filename}_{i}.png"))
+                surface.draw(page, destination / Path(f"{surface.filename}_{i}.{output_format}"))
             )
         shutil.rmtree(self.document.work_folder, ignore_errors=True)
         return paths

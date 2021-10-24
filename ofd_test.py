@@ -10,10 +10,10 @@ for path in os.listdir(folder):
     print(f"> Reading from OFD: {file_path}")
     doc = OFDFile(file_path)
     destination = os.path.join(folder, path.replace(".ofd", ""))
-    png_paths = [p.as_posix() for p in doc.draw_document(destination=destination)]
-    print(f"> Converted PNG(s):")
-    print("\n".join(png_paths))
+    img_paths = [p.as_posix() for p in doc.draw_document(destination=destination, output_format="jpg")]
+    print(f"> Converted image(s):")
+    print("\n".join(img_paths))
     pdf_path = os.path.join(folder, path.replace(".ofd", ".pdf"))
     print(f"> Writing to PDF: {pdf_path}")
     with open(pdf_path, 'wb') as pdf:
-        pdf.write(img2pdf.convert(png_paths))
+        pdf.write(img2pdf.convert(img_paths))
