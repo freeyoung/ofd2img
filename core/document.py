@@ -2,7 +2,7 @@ import io
 import os
 import traceback
 from typing import Optional
-from zipfile import PyZipFile
+from zipfile import ZipFile
 
 import cssselect2
 from defusedxml import ElementTree
@@ -26,10 +26,10 @@ class OFDFile(object):
     header = None
     #: references to document's resources
     resources = None
-    zf: PyZipFile
+    zf: ZipFile
 
-    def __init__(self, fobj):
-        self.zf = fobj if isinstance(fobj, PyZipFile) else PyZipFile(fobj)
+    def __init__(self, file_path):
+        self.zf = ZipFile(file_path)
         # for info in self._zf.infolist():
         #     print(info)
         self.node_tree = self.read_node("OFD.xml")
