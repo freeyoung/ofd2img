@@ -1,7 +1,7 @@
 import re
 import gi
 
-from .resources import Fonts, Images
+from .resources import Fonts, Images, Seals
 
 gi.require_version("Gtk", "3.0")
 gi.require_version("PangoCairo", "1.0")
@@ -266,9 +266,31 @@ def cairo_image(cr, node):
     pass
 
 
+def cairo_seal(cr, node):
+    seal_id = node.attr["ID"]
+    boundary = [float(i) for i in node.attr["Boundary"].split(" ")]
+    width, height = boundary[2], boundary[3]
+    seal_surface = get_res_seal(seal_id).get_cairo_surface()
+
+    cr.save()
+    x, y = boundary[0], boundary[1]
+    width, height = boundary[2], boundary[3]
+    cr.translate(x, y)
+    cr.scale(
+        width / seal_surface.get_width(), height / seal_surface.get_height()
+    )
+    cr.set_source_surface(seal_surface)
+    cr.paint()
+    cr.restore()
+
+
 def get_font_from_id(font_id):
     return Fonts.get(font_id)
 
 
 def get_res_image(res_id):
     return Images.get(res_id)
+
+
+def get_res_seal(seal_id):
+    return Seals.get(seal_id)

@@ -1,4 +1,3 @@
-import io
 import os
 import traceback
 from typing import Optional
@@ -8,8 +7,8 @@ import cssselect2
 from defusedxml import ElementTree
 
 from .constants import UNITS
-from .resources import res_add_font, res_add_multimedia
-from .surface import *
+from .resources import res_add_font, res_add_multimedia, res_add_signature
+from .surface import cairo, cairo_path, cairo_text, cairo_image, cairo_seal
 from pathlib import Path
 from PIL import Image, ImageStat
 from io import BytesIO
@@ -63,6 +62,7 @@ class OFDFile(object):
 class OFDDocument(object):
     def __init__(self, _zf, node, n=0):
         self.pages = []
+        self.signatures = []
         self._zf = _zf
         self.work_folder = tempfile.mkdtemp()
         self.name = f"Doc_{n}"
@@ -71,9 +71,6 @@ class OFDDocument(object):
             float(i)
             for i in node["CommonData"]["PageArea"]["PhysicalBox"].text.split(" ")
         ]
-        self._parse_res()
-        # print('Resources:', Fonts, Images)
-        # assert len(node['CommonData']['TemplatePage']) == len(node['Pages']['Page'])
         if isinstance(node["Pages"]["Page"], list):
             sorted_pages = sorted(
                 node["Pages"]["Page"], key=lambda x: int(x.attr["ID"])
@@ -88,33 +85,50 @@ class OFDDocument(object):
                 )
             else:
                 sorted_tpls = [node["CommonData"]["TemplatePage"]]
-
-        seal_node = None
-        if f"{self.name}/Signs/Sign_0/SignedValue.dat" in _zf.namelist():
-            seal_file = OFDFile(
-                io.BytesIO(_zf.read(f"{self.name}/Signs/Sign_0/SignedValue.dat"))
+        if f"{self.name}/Signs/Signatures.xml" in self._zf.namelist():
+            node = Node.from_zp_location(
+                self._zf, f"{self.name}/Signs/Signatures.xml"
             )
-            seal_node = seal_file.document.pages[0].page_node
+            if isinstance(node["Signature"], list):
+                for sign in node["Signature"]:
+                    self.signatures.append(sign)
+            else:
+                self.signatures.append(node["Signature"])
+
+        self._parse_res()
+        # print('Resources:', Fonts, Images)
+        # assert len(node['CommonData']['TemplatePage']) == len(node['Pages']['Page'])
+
+        seal_nodes = {}
+        for sign in (s for s in self.signatures if s.attr["Type"] == "Seal"):
+            node = Node.from_zp_location(
+                self._zf, f"{self.name}/Signs/{sign.attr['BaseLoc']}"
+            )
+            seal_node = node["SignedInfo"]["StampAnnot"]
+            seal_node.attr.update({
+                "ID": sign.attr["ID"],
+                "BaseLoc": f"{self.name}/Signs/{sign.attr['BaseLoc']}",
+            })
+            seal_nodes[seal_node.attr["PageRef"]] = seal_node
 
         for i, p in enumerate(sorted_pages):
-            document = _zf.read(self.name + "/" + sorted_pages[i].attr["BaseLoc"])
-            tree = ElementTree.fromstring(document)
-            root = cssselect2.ElementWrapper.from_xml_root(tree)
-            page_node = Node(root)
+            page_node = Node.from_zp_location(
+                _zf, self.name + "/" + sorted_pages[i].attr["BaseLoc"]
+            )
 
             tpl_node = None
             if i < len(sorted_tpls):
-                document = _zf.read(self.name + "/" + sorted_tpls[i].attr["BaseLoc"])
-                tree = ElementTree.fromstring(document)
-                root = cssselect2.ElementWrapper.from_xml_root(tree)
-                tpl_node = Node(root)
+                tpl_node = Node.from_zp_location(
+                    _zf, self.name + "/" + sorted_tpls[i].attr["BaseLoc"]
+                )
+
             self.pages.append(
                 OFDPage(
                     self,
                     f"Page_{i}",
                     page_node,
                     tpl_node,
-                    seal_node if i == 0 else None,
+                    seal_nodes.get(p.attr["ID"]),
                 )
             )
 
@@ -130,6 +144,10 @@ class OFDDocument(object):
                 self._zf, f"{self.name}/{self.node['CommonData']['PublicRes'].text}"
             )
             self._parse_res_node(node)
+
+        if f"{self.name}/Signs/Signatures.xml" in self._zf.namelist():
+            for node in self.signatures:
+                self._parse_res_node(node)
 
     def _parse_res_node(self, node):
         if node.tag in RESOURCE_TAGS:
@@ -186,6 +204,7 @@ class Surface(object):
             # Only draw known tags
             self.cairo_draw(cr, child)
 
+    # 已经有 self.page 了，为什么这里还要传 page?
     def draw(self, page, path: Optional[str] = None) -> str:
         # 计算A4 210mm 192dpi 下得到的宽高
         physical_width = self.page.physical_box[2]
@@ -209,8 +228,6 @@ class Surface(object):
         # self.cr.scale(self.pixels_per_mm, self.pixels_per_mm)
         # draw StampAnnot
         if self.page.seal_node:
-            # fixme: hardcode seal position
-            self.cr.translate(90, 8)
             self.cairo_draw(self.cr, self.page.seal_node)
 
         bio = BytesIO()
@@ -230,11 +247,13 @@ CAIRO_TAGS = {
     "PathObject": cairo_path,
     "TextObject": cairo_text,
     "ImageObject": cairo_image,
+    "StampAnnot": cairo_seal,
 }
 
 RESOURCE_TAGS = {
     "Font": res_add_font,
     "MultiMedia": res_add_multimedia,
+    "Signature": res_add_signature,
 }
 
 
@@ -263,6 +282,10 @@ class Node(dict):
                         self[child_node.tag] = [self[child_node.tag], child_node]
                 else:
                     self[child_node.tag] = child_node
+
+    def __bool__(self):
+        # 否则当没有 child_node.tag 的时候，作为一个 dict，会被认为是 False
+        return bool(super().__len__()) or bool(self.tag)
 
     @staticmethod
     def from_zp_location(zf, location):

@@ -2,3 +2,4 @@ defusedxml
 cssselect2
 pillow
 img2pdf
+asn1
