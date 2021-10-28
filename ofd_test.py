@@ -2,6 +2,7 @@ from core.document import OFDFile
 import os
 import img2pdf
 
+os.environ['OFD_FONT_MUST_EXIST'] = "1"
 folder = "ofds"
 for path in os.listdir(folder):
     if not path.endswith(".ofd"):
