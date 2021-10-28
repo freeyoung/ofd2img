@@ -146,19 +146,19 @@ def cairo_path(cr, node):
             float(i) / 255.0 for i in node["StrokeColor"].attr["Value"].split(" ")
         ]
     # print('draw path', boundary, fillColor, strokeColor)
+    AbbreviatedData = node["AbbreviatedData"].text
     cr.save()
     if ctm:
         # 如果有ctm，对cr进行的矩阵变换
         # print('cairo path ctm:', ctm)
         ctm_matrix = cairo.Matrix(*ctm)
-        matrix = cr.get_matrix().multiply(ctm_matrix)
-        cr.set_matrix(matrix)
-        ctm_matrix.invert()
-        cr.translate(*ctm_matrix.transform_point(boundary[0], boundary[1]))
-    else:
-        cr.translate(boundary[0], boundary[1])
+        _, mx, my, _, lx, ly = AbbreviatedData.strip().split(" ")
+        mx, my = ctm_matrix.transform_point(float(mx), float(my))
+        lx, ly = ctm_matrix.transform_point(float(lx), float(ly))
+        AbbreviatedData = f"M {mx} {my} L {lx} {ly}"
+        lineWidth = ctm_matrix.transform_distance(lineWidth, 0)[0]
+    cr.translate(boundary[0], boundary[1])
 
-    AbbreviatedData = node["AbbreviatedData"].text
     cr.set_source_rgba(*strokeColor)
     cr.set_line_width(lineWidth)
     _cairo_draw_path(cr, boundary, AbbreviatedData)
