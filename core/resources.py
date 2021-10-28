@@ -1,3 +1,4 @@
+import os
 import platform
 import gi
 from PIL import Image as PILImage
@@ -28,8 +29,13 @@ Cairo_Font_Family_Names = [f.get_name() for f in font_map.list_families()]
 OFD_FONT_MAP = {
     "楷体": ["KaiTi", "Kai"],
     "KaiTi": ["KaiTi", "Kai"],
-    "宋体": ["SimSun", "FangSong", "STSong"],
+    "宋体": ["SimSun", "STSong"],
     "Courier New": ["Courier New", "Courier"],
+    "SimSun": ["SimSun", "STSong"],
+    "FZXBSK--GBK1-0": ["FZXiaoBiaoSong-B05"],
+    "FZFSK--GBK1-0": ["FZFangSong-Z02"],
+    "E-BX": ["FZShuSong-Z01"],
+    "E-BZ": ["FZShuSong-Z01"],
 }
 
 
@@ -58,7 +64,8 @@ class Font(object):
             for c in candidates:
                 if c in Cairo_Font_Family_Names:
                     return c
-            # raise ResNotFoundException(f"Can't find '{self.FontName}' font file")
+        if bool(os.getenv('OFD_FONT_MUST_EXIST')):
+            raise ResNotFoundException(f"Can't find font '{self.FontName}' and its replacements {OFD_FONT_MAP[self.FontName]}!")
         return self.FontName
 
     def __repr__(self):
