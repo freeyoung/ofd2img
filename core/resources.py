@@ -2,17 +2,20 @@ import os
 import platform
 import gi
 from PIL import Image as PILImage
+from io import BytesIO
 
 gi.require_version("Gtk", "3.0")
 gi.require_version("PangoCairo", "1.0")
 from gi.repository import PangoCairo
 import cairo
+import asn1
 from subprocess import Popen, PIPE
 
 
 Fonts = {}
 MultiMedias = {}
 Images = {}
+Seals = {}
 font_map = PangoCairo.font_map_get_default()
 Cairo_Font_Family_Names = [f.get_name() for f in font_map.list_families()]
 # print(Cairo_Font_Family_Names)
@@ -87,7 +90,7 @@ class Image(MultiMedia):
     def __init__(self, node, _zf, work_folder: str):
         super().__init__(node)
         self.png_location = None
-        self.Format = node.attr["Format"] if "Format" in node.attr else ""
+        self.Format = node.attr["Format"] if "Format" in node.attr else "png"
         suffix = self.location.split(".")[-1]
         if suffix == "jb2":
             jb2_path = [loc for loc in _zf.namelist() if self.location in loc][0]
@@ -123,6 +126,47 @@ class Image(MultiMedia):
         return f"Image ID:{self.ID}, Format:{self.Format}"
 
 
+class Seal(Image):
+    def __init__(self, node, _zf, work_folder: str):
+        self.ID = node.attr["ID"]
+        self.Type = node.attr["Type"]
+        self.location = node.attr["BaseLoc"].split("/")[0]
+        self.png_location = None
+        self.Format = "png"
+
+        signedvalue_loc = [
+            loc for loc in _zf.namelist()
+            if f'{self.location}/SignedValue.dat' in loc
+        ][0]
+        signedvalue_path = _zf.extract(signedvalue_loc, path=work_folder)
+
+        # ASN1 在线调试工具 https://lapo.it/asn1js/
+        # 从 SignedValue.dat 中解析出签章的数据
+        with open(signedvalue_path, "rb") as f:
+            signedvalue_data = f.read()
+        decoder = asn1.Decoder()
+        decoder.start(signedvalue_data)
+        decoder.enter()
+        decoder.enter()
+        _, value = decoder.read()
+        decoder.enter()
+        decoder.enter()
+        _, value = decoder.read()
+        _, value = decoder.read()
+        _, value = decoder.read()
+        decoder.enter()
+        _, value = decoder.read()  # value = 'gif'
+        _, value = decoder.read()  # value = b'GIF89a....'
+
+        png_path = signedvalue_path.replace("SignedValue.dat", f"seal_{self.ID}.png")
+        with PILImage.open(BytesIO(value)) as im:
+            im.save(png_path)
+        self.png_location = png_path
+
+    def __repr__(self):
+        return f"Seal ID:{self.ID} Format:{self.Format}"
+
+
 def res_add_font(node, _zf, work_folder):
     Fonts[node.attr["ID"]] = Font(node.attr)
 
@@ -131,3 +175,9 @@ def res_add_multimedia(node, _zf, work_folder):
     if node.attr["Type"] == "Image":
         image = Image(node, _zf, work_folder)
         Images[node.attr["ID"]] = image
+
+
+def res_add_signature(node, _zf, work_folder):
+    if node.attr["Type"] == "Seal":
+        seal = Seal(node, _zf, work_folder)
+        Seals[node.attr["ID"]] = seal

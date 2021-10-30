@@ -28,7 +28,7 @@
     ```
 ## Usage
 
-安装好对应的依赖，调用 OFDFile.draw_document 会生成 PNG 图片。
+安装好对应的依赖，调用 `OFDFile.draw_document()` 会生成 PNG 图片。
 
 ```python
 from core.document import OFDFile
@@ -40,7 +40,4 @@ doc.draw_document()
 若要测试效果可以将 OFD 文件放在仓库根目录的 ofds 文件夹下，然后执行 `ofd_test.py`。
 
 # Need Help?
-有任何问题请提Issue。
-
-# Issues
-发票签章位置Hardcode。
+有任何问题请提 Issue。
