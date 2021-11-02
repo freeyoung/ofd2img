@@ -113,7 +113,7 @@ class Image(MultiMedia):
                     im.save(png_path)
 
             self.png_location = png_path
-        elif suffix in ("jpg", "jpeg"):
+        elif suffix in ("jpg", "jpeg") or self.Format.lower() == "jpg":
             jpg_path = [loc for loc in _zf.namelist() if self.location in loc][0]
 
             x_path = _zf.extract(jpg_path, path=work_folder)
