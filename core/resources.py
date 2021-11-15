@@ -30,6 +30,9 @@ Cairo_Font_Family_Names = [f.get_name() for f in font_map.list_families()]
 # )
 
 OFD_FONT_MAP = {
+    "Calibri": ["Calibri"],
+    "TimesNewRomanPSMT": ["Times New Roman"],
+    "TimesNewRomanPS-BoldMT": ["Times New Roman"],
     "楷体": ["KaiTi", "Kai"],
     "KaiTi": ["KaiTi", "Kai"],
     "宋体": ["SimSun", "STSong"],
@@ -38,8 +41,10 @@ OFD_FONT_MAP = {
     "FZXBSK--GBK1-0": ["FZXiaoBiaoSong-B05"],
     "方正小标宋简体": ["FZXiaoBiaoSong-B05"],
     "FZFSK--GBK1-0": ["FZFangSong-Z02"],
+    "FangSong": ["FZFangSong-Z02"],
     "方正仿宋_GBK": ["FZFangSong-Z02"],
     "FZHTK--GBK1-0": ["FZHei-B01"],
+    "SimHei": ["FZHei-B01"],
     "方正黑体_GBK": ["FZHei-B01"],
     "FZSSK--GBK1-0": ["FZShuSong-Z01"],
     "方正书宋_GBK": ["FZShuSong-Z01"],
