@@ -48,8 +48,12 @@ OFD_FONT_MAP = {
     "方正黑体_GBK": ["FZHei-B01"],
     "FZSSK--GBK1-0": ["FZShuSong-Z01"],
     "方正书宋_GBK": ["FZShuSong-Z01"],
+    "FZKTK--GBK1-0": ["FZKai-Z03"],
+    "方正楷体_GBK": ["FZKai-Z03"],
     "E-BX": ["FZShuSong-Z01"],
     "E-BZ": ["FZShuSong-Z01"],
+    "E-B6": ["FZShuSong-Z01"],
+    "E-F1": ["FZHei-B01"],
 }
 
 
