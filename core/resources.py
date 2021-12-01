@@ -30,30 +30,55 @@ Cairo_Font_Family_Names = [f.get_name() for f in font_map.list_families()]
 # )
 
 OFD_FONT_MAP = {
+    # 纯西文
     "Calibri": ["Calibri"],
+    "Courier New": ["Courier New", "Courier"],
     "TimesNewRomanPSMT": ["Times New Roman"],
     "TimesNewRomanPS-BoldMT": ["Times New Roman"],
-    "楷体": ["KaiTi", "Kai"],
-    "KaiTi": ["KaiTi", "Kai"],
-    "宋体": ["SimSun", "STSong"],
-    "Courier New": ["Courier New", "Courier"],
-    "SimSun": ["SimSun", "STSong"],
-    "FZXBSK--GBK1-0": ["FZXiaoBiaoSong-B05"],
-    "方正小标宋简体": ["FZXiaoBiaoSong-B05"],
-    "FZFSK--GBK1-0": ["FZFangSong-Z02"],
-    "FangSong": ["FZFangSong-Z02"],
-    "方正仿宋_GBK": ["FZFangSong-Z02"],
-    "FZHTK--GBK1-0": ["FZHei-B01"],
-    "SimHei": ["FZHei-B01"],
-    "方正黑体_GBK": ["FZHei-B01"],
-    "FZSSK--GBK1-0": ["FZShuSong-Z01"],
-    "方正书宋_GBK": ["FZShuSong-Z01"],
-    "FZKTK--GBK1-0": ["FZKai-Z03"],
-    "方正楷体_GBK": ["FZKai-Z03"],
+
+    # 方正 E 系列
+    # Ref: http://www.cnprint.org/bbs/archive/index.php/t-193367.html
     "E-BX": ["FZShuSong-Z01"],
     "E-BZ": ["FZShuSong-Z01"],
     "E-B6": ["FZShuSong-Z01"],
     "E-F1": ["FZHei-B01"],
+    "E-FZ": ["FZHei-B01"],
+
+    # 楷体系列
+    "楷体": ["KaiTi", "Kai"],
+    "KaiTi": ["KaiTi", "Kai"],
+    "方正楷体_GBK": ["FZKai-Z03"],
+    "FZKTK--GBK1-0": ["FZKai-Z03"],
+
+    # 宋体系列
+    "宋体": ["SimSun", "STSong"],
+    "SimSun": ["SimSun", "STSong"],
+    "*SimSun-4399": ["SimSun", "STSong"],
+    "*Adobe Song Std L-Bold-4400": ["SimSun", "STSong"],
+
+    # 仿宋系列
+    "FangSong_GB2312": ["FangSong_GB2312"],
+    "方正仿宋_GBK": ["FZFangSong-Z02"],
+    "FangSong": ["FZFangSong-Z02"],
+    "FZFSK--GBK1-0": ["FZFangSong-Z02"],
+    "*FangSong-4401": ["FZFangSong-Z02"],
+    "*FangSong-4403": ["FZFangSong-Z02"],
+    "*FangSong-Bold-4402": ["FZFangSong-Z02"],
+
+    # 黑体系列
+    "SimHei": ["FZHei-B01"],
+    "方正黑体_GBK": ["FZHei-B01"],
+    "FZHTK--GBK1-0": ["FZHei-B01"],
+
+    "FZXBSK--GBK1-0": ["FZXiaoBiaoSong-B05"],
+    "FZXBSJW--GB1-0": ["FZXiaoBiaoSong-B05"],
+    "方正小标宋简体": ["FZXiaoBiaoSong-B05"],
+    "FZS3K--GBK1-0": ["FZSong III-Z05"],
+    "方正宋三_GBK": ["FZSong III-Z05"],
+
+    "FZSSK--GBK1-0": ["FZShuSong-Z01"],
+    "方正书宋_GBK": ["FZShuSong-Z01"],
+
 }
 
 
