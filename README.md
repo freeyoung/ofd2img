@@ -39,5 +39,11 @@ doc.draw_document()
 
 若要测试效果可以将 OFD 文件放在仓库根目录的 ofds 文件夹下，然后执行 `ofd_test.py`。
 
+## FAQ
+
+1. 纯文字版 OFD 转换时报错 `KeyError: 'could not find foreign type Context'`?
+
+    如果是 Debian/Ubuntu: `apt install python3-gi-cairo`
+
 # Need Help?
 有任何问题请提 Issue。
