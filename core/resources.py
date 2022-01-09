@@ -57,6 +57,7 @@ OFD_FONT_MAP = {
     "*Adobe Song Std L-Bold-4400": ["SimSun", "STSong"],
 
     # 仿宋系列
+    "仿宋": ["FangSong_GB2312"],
     "FangSong_GB2312": ["FangSong_GB2312"],
     "方正仿宋_GBK": ["FZFangSong-Z02"],
     "FangSong": ["FZFangSong-Z02"],
@@ -72,6 +73,7 @@ OFD_FONT_MAP = {
 
     "FZXBSK--GBK1-0": ["FZXiaoBiaoSong-B05"],
     "FZXBSJW--GB1-0": ["FZXiaoBiaoSong-B05"],
+    "方正小标宋_GBK": ["FZXiaoBiaoSong-B05"],
     "方正小标宋简体": ["FZXiaoBiaoSong-B05"],
     "FZS3K--GBK1-0": ["FZSong III-Z05"],
     "方正宋三_GBK": ["FZSong III-Z05"],
