@@ -101,6 +101,7 @@ class OFDDocument(object):
 
         seal_nodes = {}
         for sign in (s for s in self.signatures if s.attr["Type"] == "Seal"):
+            sign.attr['BaseLoc'] = sign.attr['BaseLoc'].replace(f"/{self.name}/Signs/", "")
             node = Node.from_zp_location(
                 self._zf, f"{self.name}/Signs/{sign.attr['BaseLoc']}"
             )
